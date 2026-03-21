@@ -105,48 +105,49 @@ Here's a few examples to get you started.
 
 Note: connection to the Bluesky API is made via Clark Rasmussen's [BlueskyApi](https://github.com/cjrasmussen/BlueskyApi) which this makes a connection to Bluesky and manages tokens etc. See [here](https://github.com/cjrasmussen/BlueskyApi) for more details.
 
-###  Setup and connect to Bluesky
+###  Setup and connect to WordPress
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
-use williamsdb\php2Micropost\php2Micropost;
+use williamsdb\php2micropost\php2Micropost;
 
-$php2Micropost = new php2Micropost();
+$base_url = 'https://www.your-domain.com/wp-json/wp/v2';
+$username = 'WordPress username with write permissions';
+$password = 'Your 24-character Application Password';  
 
-$handle = 'yourhandle.bsky.social';
-$password = 'abcd-efgh-ijkl-mnop';
-    
-// connect to Bluesky API
-$connection = $php2Micropost->bluesky_connect($handle, $password);
+$php2Micropost = new php2Micropost($base_url, $username, $password);
+$connection = $php2Micropost->wordpress_connect();
 ```
 
-### Sending text with tags
+### Sending post with only text
 
 ```php
-$text = "This is some text with a #hashtag.";
+$text = "This is a test post from php2Micropost. " . date('Y-m-d H:i:s');
 
-$response = $php2Micropost->post_to_bluesky($connection, $text);
-print_r($response);
-if (!isset($response->error)){
-    $url = $php2Micropost->permalink_from_response($response, $handle);
-    echo $url.PHP_EOL;            
-}
+// post with text and nothing else
+$response = $php2Micropost->post_to_wordpress(
+    connection: $connection,
+    text: $text,
+    title: '',
+    media: '',
+);
 ```
 
-### Uploading a post with a single image and embedded url
+### Uploading a post with a single image
 
 ```php
-$filename1 = 'https://upload.wikimedia.org/wikipedia/en/6/67/Bluesky_User_Profile.png';
-$text = 'Screenshot of Bluesky';
-$alt = 'This is the screenshot that Wikipedia uses for their https://en.wikipedia.org/wiki/Bluesky entry.';
+$image = "/Users/neilthompson/Downloads/IMG_9547.jpeg";
 
-$response = $php2Micropost->post_to_bluesky($connection, $text, $filename1, '', $alt);
-print_r($response);
-if (!isset($response->error)){
-    $url = $php2Micropost->permalink_from_response($response, $handle);
-    echo $url.PHP_EOL;            
-}
+$text = "This is a test post from php2Micropost. " . date('Y-m-d H:i:s');
+
+// post with text and nothing else
+$response = $php2Micropost->post_to_wordpress(
+    connection: $connection,
+    text: $text,
+    title: '',
+    media: $image,
+);
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -164,15 +165,6 @@ See the [open issues](https://github.com/williamsdb/php2Micropost/issues) for a 
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
-Thanks to the follow who have provided techincal and/or financial support for the project:
-
-* [Jan Strohschein](https://bsky.app/profile/hayglow.bsky.social)
-* [Ludwig Noujarret](https://bsky.app/profile/ludwig.noujarret.com)
-* [Paul Lee](https://bsky.app/profile/drpaullee.bsky.social)
-* [AJ](https://bsky.app/profile/asjmcguire.bsky.social)
-* [https://bsky.app/profile/bobafettfanclub.com](https://bsky.app/profile/bobafettfanclub.com)
-* [Doug "Bear" Hazard](https://bsky.app/profile/bearlydoug.com)
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -217,7 +209,7 @@ Project link - [Github](https://github.com/williamsdb/php2Micropost)
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [BlueskyApi](https://github.com/cjrasmussen/BlueskyApi)
+* [WordPress Microposts](https://wordpress.org/plugins/microposts/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
