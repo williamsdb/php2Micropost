@@ -1,0 +1,8 @@
+composer.json
+vendor/
+bin/
+src/test.php
+src/test.jpg
+src/post.php
+src/.DS_Store
+.DS_Store
