@@ -1,0 +1,33 @@
+{
+  "name": "williamsdb/php2micropost",
+  "description": "A library that makes posting to Wordpress Microposts from PHP simple.",
+  "keywords": [
+    "Wordpress",
+    "Microposts",
+    "PHP"
+  ],
+  "homepage": "https://spokenlikeageek.com/microposts",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Neil Thompson",
+      "homepage": "https://spokenlikeageek.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/williamsdb/php2micropost/issues",
+    "source": "https://github.com/williamsdb/php2micropost"
+  },
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "williamsdb\\php2micropost\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.0",
+    "ext-curl": "*",
+    "ext-fileinfo": "*"
+  }
+}
