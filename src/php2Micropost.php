@@ -148,7 +148,7 @@ class php2Micropost
         return $media_id;
     }
 
-    public function post_to_wordpress($connection, $text, $title = '', $media = '')
+    public function post_to_wordpress($connection, $text, $title = '', $media = '', $tags = [])
     {
 
         // if we have media, upload it first and get the media ID to attach to the post
@@ -175,12 +175,21 @@ class php2Micropost
             }
         }
 
-        // create the post data, including the media ID if we have one
+        // process any tags passed
+        $tag_ids = [];
+
+        foreach ($tags as $name) {
+            $id = $this->get_or_create_micropost_tag($name, $this->base_url, $connection);
+            if ($id) $tag_ids[] = $id;
+        }
+
+        // create the post data, including the media ID and tags if applicable
         $post_data = [
             'title'          => $title,
             'content'        => $text,
             'status'         => 'publish',
             ...!empty($media) ? ['featured_media' => $media_id] : [],
+            ...!empty($tag_ids) ? ['micropost_tag' => $tag_ids] : [],
         ];
 
         $ch = curl_init("{$this->base_url}/micropost");
@@ -272,5 +281,35 @@ class php2Micropost
         });
 
         return $urlData;
+    }
+
+    // Get a Tag ID by name, or create it if it doesn't exist.
+    private function get_or_create_micropost_tag($tag_name, $base_url, $auth_header)
+    {
+        // 1. Search for existing tag
+        $search_url = $base_url . '/micropost_tag?search=' . urlencode($tag_name);
+
+        $ch = curl_init($search_url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [$auth_header]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = json_decode(curl_exec($ch));
+        unset($ch);
+
+        // If found, return the ID of the first match
+        if (!empty($response) && isset($response[0]->id)) {
+            return $response[0]->id;
+        }
+
+        // 2. Not found? Create it.
+        $ch = curl_init($base_url . '/micropost_tag');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [$auth_header, 'Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['name' => $tag_name]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $create_response = json_decode(curl_exec($ch));
+        unset($ch);
+
+        return $create_response->id ?? null;
     }
 }

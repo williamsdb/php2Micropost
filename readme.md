@@ -158,6 +158,25 @@ $response = $php2Micropost->post_to_wordpress(
 );
 ```
 
+### Adding tags to a post
+
+If the tag already exists, it will be associated with the post; otherwise, it will be created.
+
+```php
+$tags = ['test', 'php2Micropost', 'reading'];
+
+$text = "This is a test post from php2Micropost. " . date('Y-m-d H:i:s');
+
+// post with text and nothing else
+$response = $php2Micropost->post_to_wordpress(
+    connection: $connection,
+    text: $text,
+    title: '',
+    media: $image,
+    tags: $tags,
+);
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
