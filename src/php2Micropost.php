@@ -13,6 +13,7 @@ namespace williamsdb\php2micropost;
 
 use williamsdb\php2micropost\WordpressConsts;
 use williamsdb\php2micropost\php2MicropostException;
+use williamsdb\php2micropost\RegexPatterns;
 use williamsdb\php2micropost\Version; // Not utilised, for documentation only
 
 /**
@@ -26,12 +27,16 @@ class php2Micropost
     private string $base_url;
     private string $username;
     private string $password;
+    private bool $parseUrls;
+    private string $fileUploadDir;
 
-    public function __construct(string $base_url, string $username, string $password)
+    public function __construct(string $base_url, string $username, string $password, bool $parseUrls = true, $fileUploadDir = '/tmp')
     {
         $this->base_url = $base_url;
         $this->username = $username;
         $this->password = $password;
+        $this->parseUrls = $parseUrls;
+        $this->fileUploadDir = $fileUploadDir;
     }
 
     public function wordpress_connect()
@@ -39,7 +44,7 @@ class php2Micropost
         return 'Authorization: Basic ' . base64_encode("{$this->username}:{$this->password}");
     }
 
-    private function upload_media_to_wordpress($connection, $filename, $fileUploadDir = '/tmp')
+    private function upload_media_to_wordpress($connection, $filename)
     {
 
         // helper: fetch remote file with cURL
@@ -107,7 +112,7 @@ class php2Micropost
                 }
 
                 for ($i = 9; $i >= 1; $i--) {
-                    $tempFile = $fileUploadDir . '/' . $basename;
+                    $tempFile = $this->fileUploadDir . '/' . $basename;
                     imagejpeg($newImage, $tempFile, $i * 10);
                     $size = filesize($tempFile);
 
@@ -146,10 +151,31 @@ class php2Micropost
     public function post_to_wordpress($connection, $text, $title = '', $media = '')
     {
 
+        // if we have media, upload it first and get the media ID to attach to the post
         if (!empty($media)) {
             $media_id = $this->upload_media_to_wordpress($connection, $media);
         }
 
+        // parse for URLs
+        if ($this->parseUrls) {
+            $urls = $this->mark_urls($text);
+            if (!empty($urls)) {
+                $offset = 0;
+                foreach ($urls as $url) {
+                    $start = $url['start'] + $offset;
+                    $end = $url['end'] + $offset;
+                    $link = "<a href=\"{$url['url']}\">";
+
+                    $text = substr_replace($text, $link, $start, 0);
+                    $offset += strlen($link);
+
+                    $text = substr_replace($text, '</a>', $end + strlen($link), 0);
+                    $offset += 4;
+                }
+            }
+        }
+
+        // create the post data, including the media ID if we have one
         $post_data = [
             'title'          => $title,
             'content'        => $text,
@@ -187,5 +213,64 @@ class php2Micropost
             // If the path is a local path, use basename to get the filename
             return basename($path);
         }
+    }
+
+    // find URLs in text and return their positions and full URLs (including protocol)
+    private function mark_urls($text)
+    {
+        // First find URLs with protocols
+        preg_match_all(RegexPatterns::URL_REGEX, $text, $matches, PREG_OFFSET_CAPTURE);
+
+        $urlData = array();
+
+        foreach ($matches[0] as $match) {
+            $url = $match[0];
+            $start = $match[1];
+            $end = $start + strlen($url);
+
+            $urlData[] = array(
+                'start' => $start,
+                'end' => $end,
+                'url' => $url,
+            );
+        }
+
+        // Then find URLs without protocols (starting with www. or common TLDs)
+        $noProtocolRegex = '/(?<!\S)(www\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(?:\/[^\s]*)?|[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.(?:com|org|net|edu|gov|mil|int|co|uk|de|fr|jp|au|us|ru|ch|it|nl|se|no|es|mil)(?:\/[^\s]*)?)(?!\S)/i';
+
+        preg_match_all($noProtocolRegex, $text, $noProtocolMatches, PREG_OFFSET_CAPTURE);
+
+        foreach ($noProtocolMatches[0] as $match) {
+            $url = $match[0];
+            $start = $match[1];
+            $end = $start + strlen($url);
+
+            // Check if this URL overlaps with any already found protocol URLs
+            $overlap = false;
+            foreach ($urlData as $existingUrl) {
+                if ($start < $existingUrl['end'] && $end > $existingUrl['start']) {
+                    $overlap = true;
+                    break;
+                }
+            }
+
+            if (!$overlap) {
+                // Prepend https:// for URLs without protocol
+                $fullUrl = 'https://' . $url;
+
+                $urlData[] = array(
+                    'start' => $start,
+                    'end' => $end,
+                    'url' => $fullUrl,
+                );
+            }
+        }
+
+        // Sort by start position to maintain order
+        usort($urlData, function ($a, $b) {
+            return $a['start'] - $b['start'];
+        });
+
+        return $urlData;
     }
 }

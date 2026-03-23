@@ -103,8 +103,6 @@ Requirements are very simple; it requires the following:
 
 Here's a few examples to get you started. 
 
-Note: connection to the Bluesky API is made via Clark Rasmussen's [BlueskyApi](https://github.com/cjrasmussen/BlueskyApi) which this makes a connection to Bluesky and manages tokens etc. See [here](https://github.com/cjrasmussen/BlueskyApi) for more details.
-
 ###  Setup and connect to WordPress
 
 ```php
@@ -115,12 +113,20 @@ use williamsdb\php2micropost\php2Micropost;
 $base_url = 'https://www.your-domain.com/wp-json/wp/v2';
 $username = 'WordPress username with write permissions';
 $password = 'Your 24-character Application Password';  
+$parseURL = false;
 
-$php2Micropost = new php2Micropost($base_url, $username, $password);
+$php2Micropost = new php2Micropost(
+    base_url: $base_url,
+    username: $username,
+    password: $password,
+    parseUrls: false,
+);
 $connection = $php2Micropost->wordpress_connect();
 ```
 
 ### Sending post with only text
+
+Text sent can either be plain text or HTML. If you send plain text and $parseURLs is TRUE then the text will be checked for URLs and if any found they will be wrapped in ```<a href="URL">URL</a>```. If you are passing HTML then $parseURLs should be set to FALSE to retain the HTML.
 
 ```php
 $text = "This is a test post from php2Micropost. " . date('Y-m-d H:i:s');
@@ -135,6 +141,8 @@ $response = $php2Micropost->post_to_wordpress(
 ```
 
 ### Uploading a post with a single image
+
+Microposts only accepts a single image so that's all that is allowed here.
 
 ```php
 $image = "/Users/neilthompson/Downloads/IMG_9547.jpeg";
