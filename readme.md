@@ -1,6 +1,5 @@
 <a name="readme-top"></a>
 
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -12,8 +11,6 @@
     <br />
   </p>
 </div>
-
-
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -41,9 +38,8 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 I have accounts on plenty of microblogging sites (Twitter, Mastodon, Bluesky and even Threads) but they are all owned and controlled by someone else. I decided that I wanted something that I could use and manage, and a quick search came up with [Michael Gbadebo](https://mothcloud.com/introducing-microposts-microblogging-for-wordpress/)'s WordPress plugin called [Microposts](https://wordpress.org/plugins/microposts/).
@@ -56,26 +52,23 @@ Very much inspired by my [php2Micropost](https://github.com/williamsdb/php2Micro
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 ### Built With
 
-* [PHP](https://php.net)
-* [WordPress API](https://developer.wordpress.com/docs/api/)
-* [Microposts plugin by Michael Gbadebo](https://wordpress.org/plugins/microposts/)
+- [PHP](https://php.net)
+- [WordPress API](https://developer.wordpress.com/docs/api/)
+- [Microposts plugin by Michael Gbadebo](https://wordpress.org/plugins/microposts/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 Running the script is very straightforward:
 
 1. install [composer](https://getcomposer.org/)
 
-3. add php2Micropost
+2. add php2Micropost
 
 > composer.phar require williamsdb/php2micropost
 
@@ -87,8 +80,8 @@ Requirements are very simple; it requires the following:
 
 1. PHP (I tested on v8.1.13)
 2. WordPress (I tested on 6.9.4)
-2. Michael Gbadebo's [Micropost plugin](https://wordpress.org/plugins/microposts/)
-3. a WordPress blog and an Application Password (see [this post](https://www.spokenlikeageek.com/2023/08/02/exporting-all-wordpress-posts-to-pdf/) for details of how to do that).
+3. Michael Gbadebo's [Micropost plugin](https://wordpress.org/plugins/microposts/)
+4. a WordPress blog and an Application Password (see [this post](https://www.spokenlikeageek.com/2023/08/02/exporting-all-wordpress-posts-to-pdf/) for details of how to do that).
 
 ### Installation
 
@@ -96,14 +89,13 @@ Requirements are very simple; it requires the following:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
-Here's a few examples to get you started. 
+Here's a few examples to get you started.
 
-###  Setup and connect to WordPress
+### Setup and connect to WordPress
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
@@ -112,7 +104,7 @@ use williamsdb\php2micropost\php2Micropost;
 
 $base_url = 'https://www.your-domain.com/wp-json/wp/v2';
 $username = 'WordPress username with write permissions';
-$password = 'Your 24-character Application Password';  
+$password = 'Your 24-character Application Password';
 $parseURL = false;
 
 $php2Micropost = new php2Micropost(
@@ -120,13 +112,14 @@ $php2Micropost = new php2Micropost(
     username: $username,
     password: $password,
     parseUrls: false,
+    autoRotate: false
 );
 $connection = $php2Micropost->wordpress_connect();
 ```
 
 ### Sending post with only text
 
-Text sent can either be plain text or HTML. If you send plain text and $parseURLs is TRUE then the text will be checked for URLs and if any found they will be wrapped in ```<a href="URL">URL</a>```. If you are passing HTML then $parseURLs should be set to FALSE to retain the HTML.
+Text sent can either be plain text or HTML. If you send plain text and $parseURLs is TRUE then the text will be checked for URLs and if any found they will be wrapped in `<a href="URL">URL</a>`. If you are passing HTML then $parseURLs should be set to FALSE to retain the HTML.
 
 ```php
 $text = "This is a test post from php2Micropost. " . date('Y-m-d H:i:s');
@@ -179,18 +172,16 @@ $response = $php2Micropost->post_to_wordpress(
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- ROADMAP -->
+
 ## Known Issues
 
 See the [open issues](https://github.com/williamsdb/php2Micropost/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -206,25 +197,23 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the GNU General Public License v3.0. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- CONTACT -->
+
 ## Contact
 
 Bluesky - [@spokenlikeageek.com](https://bsky.app/profile/spokenlikeageek.com)
 
 Mastodon - [@spokenlikeageek](https://techhub.social/@spokenlikeageek)
 
-X - [@spokenlikeageek](https://x.com/spokenlikeageek) 
+X - [@spokenlikeageek](https://x.com/spokenlikeageek)
 
 Website - [https://spokenlikeageek.com](https://www.spokenlikeageek.com/tag/microposts/)
 
@@ -232,14 +221,13 @@ Project link - [Github](https://github.com/williamsdb/php2Micropost)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 <!-- ACKNOWLEDGMENTS -->
+
 ## Acknowledgments
 
-* [WordPress Microposts](https://wordpress.org/plugins/microposts/)
+- [WordPress Microposts](https://wordpress.org/plugins/microposts/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 [![](https://github.com/williamsdb/php2Micropost/graphs/contributors)](https://img.shields.io/github/contributors/williamsdb/php2Micropost.svg?style=for-the-badge)
 
@@ -247,8 +235,10 @@ Project link - [Github](https://github.com/williamsdb/php2Micropost)
 ![](https://img.shields.io/github/forks/williamsdb/php2Micropost.svg?style=for-the-badge)
 ![](https://img.shields.io/github/stars/williamsdb/php2Micropost.svg?style=for-the-badge)
 ![](https://img.shields.io/github/issues/williamsdb/php2Micropost.svg?style=for-the-badge)
+
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/williamsdb/php2Micropost.svg?style=for-the-badge
 [contributors-url]: https://github.com/williamsdb/php2Micropost/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/williamsdb/php2Micropost.svg?style=for-the-badge
@@ -277,4 +267,4 @@ Project link - [Github](https://github.com/williamsdb/php2Micropost)
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[JQuery-url]: https://jquery.com

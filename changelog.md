@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2025-05-09
+
+### Added
+
+- ability to auto rotate an image based on its EXIF data
+
 ## [1.2.0] - 2026-03-23
 
 ### Added

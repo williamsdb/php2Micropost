@@ -29,14 +29,16 @@ class php2Micropost
     private string $password;
     private bool $parseUrls;
     private string $fileUploadDir;
+    private bool $autoRotate;
 
-    public function __construct(string $base_url, string $username, string $password, bool $parseUrls = true, $fileUploadDir = '/tmp')
+    public function __construct(string $base_url, string $username, string $password, bool $parseUrls = true, $fileUploadDir = '/tmp', bool $autoRotate = true)
     {
         $this->base_url = $base_url;
         $this->username = $username;
         $this->password = $password;
         $this->parseUrls = $parseUrls;
         $this->fileUploadDir = $fileUploadDir;
+        $this->autoRotate = $autoRotate;
     }
 
     public function wordpress_connect()
@@ -105,6 +107,12 @@ class php2Micropost
 
         // does the file size need reducing? (applies to local + remote)
         if ($mime != "image/gif") {
+
+            // does the image need auto rotating?
+            if ($this->autoRotate) {
+                $body = $this->rotateImageByExif($body, $filename);
+            }
+
             if ($size > WordpressConsts::MAX_IMAGE_UPLOAD_SIZE) {
                 $newImage = imagecreatefromstring($body);
                 if ($newImage === false) {
@@ -222,6 +230,41 @@ class php2Micropost
             // If the path is a local path, use basename to get the filename
             return basename($path);
         }
+    }
+
+    // rotate image based on EXIF orientation
+    private function rotateImageByExif($body, $filename)
+    {
+        $image = imagecreatefromstring($body);
+        if ($image === false) return $body;
+
+        $exif = @exif_read_data($filename);
+        if (empty($exif['Orientation'])) return $body;
+
+        $rotated = false;
+        switch ($exif['Orientation']) {
+            case 3:
+                $image = imagerotate($image, 180, 0);
+                $rotated = true;
+                break;
+            case 6:
+                $image = imagerotate($image, -90, 0);
+                $rotated = true;
+                break;
+            case 8:
+                $image = imagerotate($image, 90, 0);
+                $rotated = true;
+                break;
+        }
+
+        if ($rotated) {
+            ob_start();
+            imagejpeg($image, null, 90);
+            $body = ob_get_clean();
+            unset($image);
+        }
+
+        return $body;
     }
 
     // find URLs in text and return their positions and full URLs (including protocol)
